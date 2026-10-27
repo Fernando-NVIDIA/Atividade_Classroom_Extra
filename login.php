@@ -46,27 +46,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - Cafeteria</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Entrar - Café Grão Dourado</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-light">
-    <div class="container" style="max-width: 400px; margin-top: 100px;">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h4 class="text-center mb-4">☕ Gestão da Cafeteria</h4>
-                <form method="POST" action="login.php">
-                    <div class="mb-3">
-                        <label for="usuario" class="form-label">Usuário</label>
-                        <input type="text" class="form-control" id="usuario" name="usuario" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="senha" class="form-label">Senha</label>
-                        <input type="password" class="form-control" id="senha" name="senha" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
-                </form>
-            </div>
-        </div>
+<body>
+    <div class="login-tela">
+        <section class="login-lado">
+            <img src="grao.svg" alt="" class="grao g1">
+            <img src="grao.svg" alt="" class="grao g2">
+            <img src="grao.svg" alt="" class="grao g3">
+            <h1>Café Grão Dourado</h1>
+            <p>Área reservada ao gerente. Entre para organizar o cardápio da casa.</p>
+        </section>
+
+        <section class="login-form-area">
+            <form class="login-form" method="POST" action="login.php">
+                <h2>Bem-vindo de volta</h2>
+                <p class="sub">Informe seus dados de acesso.</p>
+
+                <div class="campo">
+                    <label for="usuario">Usuário</label>
+                    <input type="text" id="usuario" name="usuario" required>
+                </div>
+                <div class="campo">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" required>
+                </div>
+                <button type="submit" class="btn btn-principal">Entrar</button>
+            </form>
+        </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

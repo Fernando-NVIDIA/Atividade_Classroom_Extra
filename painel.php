@@ -10,106 +10,111 @@ if (isset($_SESSION['alerta'])) {
 }
 
 // R - Listar itens
-$sql = "SELECT id, nome_item, categoria, descricao, preco, disponivel FROM cardapio ORDER BY id DESC";
+$sql = "SELECT id, nome_item, categoria, descricao, preco FROM cardapio ORDER BY id DESC";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_execute($stmt);
-$itens = mysqli_stmt_get_result($stmt);
+$resultado = mysqli_stmt_get_result($stmt);
+$itens = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+mysqli_stmt_close($stmt);
+
+// Resumo e classe de cor por categoria
+$total = count($itens);
+$contagem = ['Café' => 0, 'Doce' => 0, 'Salgado' => 0, 'Bebida Gelada' => 0];
+foreach ($itens as $i) {
+    if (isset($contagem[$i['categoria']])) {
+        $contagem[$i['categoria']]++;
+    }
+}
+$classes = ['Café' => 'cafe', 'Doce' => 'doce', 'Salgado' => 'salgado', 'Bebida Gelada' => 'gelada'];
+
+$titulo_pagina = "Cardápio";
+require "topo.php";
 ?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Painel - Cafeteria</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark mb-4">
-        <div class="container">
-            <span class="navbar-brand">☕ Painel do Cardápio</span>
-            <span class="text-white">
-                Olá, <?= htmlspecialchars($_SESSION['usuario_nome']) ?>
-                <a href="logout.php" class="btn btn-sm btn-outline-light ms-3">Sair</a>
-            </span>
-        </div>
-    </nav>
 
-    <div class="container">
-        <!-- C - Cadastrar -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header">Cadastrar novo item</div>
-            <div class="card-body">
-                <form method="POST" action="salvar_item.php" class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Nome do Item</label>
-                        <input type="text" name="nome_item" class="form-control" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Categoria</label>
-                        <select name="categoria" class="form-select" required>
-                            <option value="">Selecione...</option>
-                            <option value="Café">Café</option>
-                            <option value="Doce">Doce</option>
-                            <option value="Salgado">Salgado</option>
-                            <option value="Bebida Gelada">Bebida Gelada</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Preço (R$)</label>
-                        <input type="text" name="preco" class="form-control" placeholder="0,00" required>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Descrição</label>
-                        <textarea name="descricao" class="form-control" rows="2"></textarea>
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-success">Cadastrar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+<header>
+    <h1>Cardápio</h1>
+    <p>Cadastre, ajuste e retire itens da casa.</p>
+</header>
 
-        <!-- R - Listar -->
-        <div class="card shadow-sm mb-5">
-            <div class="card-header">Itens do cardápio</div>
-            <div class="card-body table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Categoria</th>
-                            <th>Descrição</th>
-                            <th>Preço</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (mysqli_num_rows($itens) === 0): ?>
-                            <tr><td colspan="6" class="text-center">Nenhum item cadastrado.</td></tr>
-                        <?php endif; ?>
-                        <?php while ($item = mysqli_fetch_assoc($itens)): ?>
-                            <tr>
-                                <td><?= (int) $item['id'] ?></td>
-                                <td><?= htmlspecialchars($item['nome_item']) ?></td>
-                                <td><?= htmlspecialchars($item['categoria']) ?></td>
-                                <td><?= htmlspecialchars($item['descricao'] ?? '') ?></td>
-                                <td>R$ <?= number_format($item['preco'], 2, ',', '.') ?></td>
-                                <td>
-                                    <a href="editar_item.php?id=<?= (int) $item['id'] ?>" class="btn btn-sm btn-primary">Editar</a>
-                                    <a href="excluir_item.php?id=<?= (int) $item['id'] ?>" class="btn btn-sm btn-danger"
-                                       onclick="return confirm('Excluir este item?');">Excluir</a>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            </div>
+<div class="resumo">
+    <div class="bloco"><small>Total de itens</small><b><?= $total ?></b></div>
+    <?php foreach ($contagem as $nome_cat => $qtd): ?>
+        <div class="bloco"><small><?= htmlspecialchars($nome_cat) ?></small><b><?= $qtd ?></b></div>
+    <?php endforeach; ?>
+</div>
+
+<!-- C - Cadastrar -->
+<section class="secao">
+    <h2>Novo item</h2>
+    <form method="POST" action="salvar_item.php" class="grade-form">
+        <div class="campo">
+            <label for="nome_item">Nome do item</label>
+            <input type="text" id="nome_item" name="nome_item" required>
         </div>
+        <div class="campo">
+            <label for="categoria">Categoria</label>
+            <select id="categoria" name="categoria" required>
+                <option value="">Selecione...</option>
+                <option value="Café">Café</option>
+                <option value="Doce">Doce</option>
+                <option value="Salgado">Salgado</option>
+                <option value="Bebida Gelada">Bebida Gelada</option>
+            </select>
+        </div>
+        <div class="campo">
+            <label for="preco">Preço (R$)</label>
+            <input type="text" id="preco" name="preco" placeholder="0,00" required>
+        </div>
+        <div class="campo inteira">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" rows="2"></textarea>
+        </div>
+        <div class="inteira acoes-form">
+            <button type="submit" class="btn btn-principal">Adicionar ao cardápio</button>
+        </div>
+    </form>
+</section>
+
+<!-- R - Listar -->
+<section class="secao">
+    <h2>Itens cadastrados</h2>
+    <div class="tabela-area">
+        <table class="cardapio">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Item</th>
+                    <th>Categoria</th>
+                    <th>Descrição</th>
+                    <th>Preço</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($total === 0): ?>
+                    <tr><td colspan="6" class="vazio">Nenhum item cadastrado ainda.</td></tr>
+                <?php endif; ?>
+                <?php foreach ($itens as $item): ?>
+                    <tr>
+                        <td><?= (int) $item['id'] ?></td>
+                        <td class="nome"><?= htmlspecialchars($item['nome_item']) ?></td>
+                        <td>
+                            <span class="etiqueta <?= $classes[$item['categoria']] ?? '' ?>">
+                                <?= htmlspecialchars($item['categoria']) ?>
+                            </span>
+                        </td>
+                        <td class="desc"><?= htmlspecialchars($item['descricao'] ?? '') ?></td>
+                        <td class="preco">R$ <?= number_format($item['preco'], 2, ',', '.') ?></td>
+                        <td class="acoes">
+                            <a href="editar_item.php?id=<?= (int) $item['id'] ?>" class="btn btn-claro btn-pequeno">Editar</a>
+                            <a href="excluir_item.php?id=<?= (int) $item['id'] ?>" class="btn btn-perigo btn-pequeno"
+                               onclick="return confirm('Excluir este item?');">Excluir</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
+</section>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script><?= $script_alerta ?></script>
-</body>
-</html>
-<?php mysqli_stmt_close($stmt); ?>
+<?php require "rodape.php"; ?>

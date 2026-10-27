@@ -55,51 +55,47 @@ if (!$item) {
     header("Location: painel.php");
     exit;
 }
+
+$titulo_pagina = "Editar item";
+require "topo.php";
 ?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Editar item - Cafeteria</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <div class="container" style="max-width: 700px; margin-top: 50px;">
-        <div class="card shadow-sm">
-            <div class="card-header">Editar item #<?= (int) $item['id'] ?></div>
-            <div class="card-body">
-                <form method="POST" action="editar_item.php" class="row g-3">
-                    <input type="hidden" name="id" value="<?= (int) $item['id'] ?>">
-                    <div class="col-md-8">
-                        <label class="form-label">Nome do Item</label>
-                        <input type="text" name="nome_item" class="form-control" required
-                               value="<?= htmlspecialchars($item['nome_item']) ?>">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Preço (R$)</label>
-                        <input type="text" name="preco" class="form-control" required
-                               value="<?= number_format($item['preco'], 2, ',', '') ?>">
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Categoria</label>
-                        <select name="categoria" class="form-select" required>
-                            <?php foreach ($categorias as $cat): ?>
-                                <option value="<?= $cat ?>" <?= $item['categoria'] === $cat ? 'selected' : '' ?>><?= $cat ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Descrição</label>
-                        <textarea name="descricao" class="form-control" rows="3"><?= htmlspecialchars($item['descricao'] ?? '') ?></textarea>
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Salvar alterações</button>
-                        <a href="painel.php" class="btn btn-secondary">Cancelar</a>
-                    </div>
-                </form>
-            </div>
+
+<header>
+    <h1>Editar item</h1>
+    <p>Ajuste os dados do item #<?= (int) $item['id'] ?>.</p>
+</header>
+
+<section class="secao centro">
+    <form method="POST" action="editar_item.php" class="grade-form">
+        <input type="hidden" name="id" value="<?= (int) $item['id'] ?>">
+
+        <div class="campo">
+            <label for="nome_item">Nome do item</label>
+            <input type="text" id="nome_item" name="nome_item" required
+                   value="<?= htmlspecialchars($item['nome_item']) ?>">
         </div>
-    </div>
-</body>
-</html>
+        <div class="campo">
+            <label for="categoria">Categoria</label>
+            <select id="categoria" name="categoria" required>
+                <?php foreach ($categorias as $cat): ?>
+                    <option value="<?= $cat ?>" <?= $item['categoria'] === $cat ? 'selected' : '' ?>><?= $cat ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="campo">
+            <label for="preco">Preço (R$)</label>
+            <input type="text" id="preco" name="preco" required
+                   value="<?= number_format($item['preco'], 2, ',', '') ?>">
+        </div>
+        <div class="campo inteira">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" rows="3"><?= htmlspecialchars($item['descricao'] ?? '') ?></textarea>
+        </div>
+        <div class="inteira acoes-form">
+            <button type="submit" class="btn btn-principal">Salvar alterações</button>
+            <a href="painel.php" class="btn btn-claro">Cancelar</a>
+        </div>
+    </form>
+</section>
+
+<?php require "rodape.php"; ?>
