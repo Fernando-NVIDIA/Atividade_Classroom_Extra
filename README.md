@@ -1,4 +1,4 @@
-# ☕ Café Grão Dourado — Gestão de Cardápio
+# Café Grão Dourado — Gestão de Cardápio
 
 CRUD completo em **PHP procedural + MySQLi** para o painel administrativo de uma cafeteria.
 O gerente faz login e pode **cadastrar, listar, editar e excluir** itens do cardápio.
